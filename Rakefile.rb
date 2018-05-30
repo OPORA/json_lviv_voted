@@ -7,7 +7,7 @@ end
 desc 'Scrape voted'
 task :scrape_voted, [:start_date, :end_date] do |t, arg|
  #if arg[:start_date].nil?
-   GetAllVotes.new.get_all_votes
+   GetAllVotes.new.get_all_file
  #elsif !arg[:end_date].nil?
    #GetPages.new.get_filter_votes(arg[:start_date], arg[:end_date])
  #else
