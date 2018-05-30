@@ -4,17 +4,22 @@ require 'json'
 require 'date'
 
 class GetAllVotes
+  UTF8_BOM = "\xEF\xBB\xBF".freeze
    def initialize
      $all_mp =  GetMp.new
    end
    def get_all_file
-     uri = "http://opendata.city-adm.lviv.ua//api/3/action/package_search?fq=tags:%D0%B3%D0%BE%D0%BB%D0%BE%D1%81%D1%83%D0%B2%D0%B0%D0%BD%D0%BD%D1%8F"
+
+     uri = "http://opendata.city-adm.lviv.ua//api/3/action/package_search?fq=tags:%D0%B3%D0%BE%D0%BB%D0%BE%D1%81%D1%83%D0%B2%D0%B0%D0%BD%D0%BD%D1%8F&rows=100"
      json = open(uri).read
      hash_json = JSON.parse(json)
+     p hash_json
      hash_json["result"]["results"].each do |res|
+       p res["name"]
        res["resources"].each do |f|
          p f["url"]
          p f["last_modified"]
+         #next if f["url"] == "http://opendata.city-adm.lviv.ua/dataset/254cc4ce-3721-4c20-a6cd-1a0e7f3e7329/resource/f4d4b5a9-6cda-4675-98a9-e35f70af8060/download/gol6p1.json"
          update = UpdatePar.first(url: f["url"], last_modified: f["last_modified"])
          if update.nil?
            read_file(f["url"] )
@@ -27,8 +32,9 @@ class GetAllVotes
 
     json = open(file).read
 
-    my_hash = JSON.parse(json)
+    my_hash = JSON.parse(json.force_encoding("UTF-8").gsub(/^#{UTF8_BOM}/, ''))
     p my_hash["GLTime"]
+
     date_caden = Date.strptime(my_hash["GLTime"].strip,'%d.%m.%Y')
     number = my_hash["PD_NPP"]
     p number
